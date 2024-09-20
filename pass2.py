@@ -140,8 +140,8 @@ try:
                     record('^' + string_to_hex(s[3][2:len(s[3])-1]), currentadd)
                 else:
                     if s[2] in optab and s[2] != 'RSUB':
-                        file3.write(design(s) + f" {optab[s[2]]:<2}{symtab[s[3]][2:].zfill(4):<8}\n")
-                        temp = '^' + optab[s[2]] + symtab[s[3]][2:].zfill(4)
+                        file3.write(design(s) + f" {optab[s[2]]:<2}{symtab[s[3]].zfill(4):<8}\n")
+                        temp = '^' + optab[s[2]] + symtab[s[3]].zfill(4)
                         record(temp, currentadd)
                     else:
                         file3.write(f"{s[0].zfill(4):<16}{s[2]:<8} {'  ':<8} {optab[s[2]]:<2}0000\n")
