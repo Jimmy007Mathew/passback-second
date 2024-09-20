@@ -49,7 +49,7 @@ try:
             file2.write(hex(locctr)[2:].zfill(4) + '\t' + design(s)+'\n')
 
             if s[0] != '**' and s[0] != '-':
-                file3.write(s[0] + '\t' + hex(locctr) + '\n')
+                file3.write(f"{s[0]:<8}" + hex(locctr)[2:].zfill(4) + '\n')
 
             if s[1] == 'RESW':
                 locctr += 3 * int(s[2])
