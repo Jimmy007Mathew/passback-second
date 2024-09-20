@@ -26,6 +26,8 @@ async def process_files(input_file: UploadFile = File(...), optab_file: UploadFi
     optab_file_path = TEMP_DIR / "optab.txt"
     output_file_path = TEMP_DIR / "out.txt"
     record_file_path = TEMP_DIR / "record.txt"
+    intermediate_file_path = TEMP_DIR / "intermediate.txt"
+    symtab_file_path = TEMP_DIR / "symtab.txt"
 
     try:
         # Write the input file
@@ -45,6 +47,10 @@ async def process_files(input_file: UploadFile = File(...), optab_file: UploadFi
         )
         print("Pass1 Output:", result1.stdout)
 
+        # Check if intermediate_file and symtab_file were created
+        if not intermediate_file_path.exists() or not symtab_file_path.exists():
+            return {"error": "Intermediate or Symtab file not found"}
+
         # Run pass2 script to generate the final output
         result2 = subprocess.run(
             ["python", "pass2.py"],
@@ -61,6 +67,13 @@ async def process_files(input_file: UploadFile = File(...), optab_file: UploadFi
         # Read the output file
         with output_file_path.open("r") as result_file:
             output_content = result_file.read()
+        
+        # Read the intermediate and symtab files
+        with intermediate_file_path.open("r") as intermediate_file:
+            intermediate_content = intermediate_file.read()
+
+        with symtab_file_path.open("r") as symtab_file:
+            symtab_content = symtab_file.read()
 
         # Read the record file if it exists
         record_content = ""
@@ -68,13 +81,18 @@ async def process_files(input_file: UploadFile = File(...), optab_file: UploadFi
             with record_file_path.open("r") as record_file:
                 record_content = record_file.read()
 
-        return {"output_file": output_content, "record_file": record_content}
+        return {
+            "output_file": output_content,
+            "record_file": record_content,
+            "intermediate_file": intermediate_content,
+            "symtab_file": symtab_content
+        }
 
     except subprocess.CalledProcessError as e:
         # Catch errors in subprocess calls and provide feedback
         print(f"Error running script: {e.stderr}")
-        return {"output_file": f"Error running scripts: {e.stderr}", "record_file": ""}
+        return {"error": f"Error running scripts: {e.stderr}"}
     except Exception as e:
         # Catch any other errors
         print(f"Unexpected error: {e}")
-        return {"output_file": "Error processing files", "record_file": ""}
+        return {"error": "Error processing files"}
