@@ -70,6 +70,8 @@ try:
 except Exception as e:
     error_message = f"Error has occurred: {str(e)}\n"
     
-    with record_file_path.open('a') as file4, output_file_path.open('a') as file5:
+    with intermediate_file_path.open(w) as file2, symtab_file_path.open(w) as file3,record_file_path.open('w') as file4, output_file_path.open('w') as file5:
         file4.write(error_message)
         file5.write(error_message)
+        file2.write(error_message)
+        file3.write(error_message)
