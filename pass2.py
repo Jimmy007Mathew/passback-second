@@ -5,16 +5,16 @@ def design(inline):
     if len(inline) == 4:
         label, opcode, operand = inline[1], inline[2], inline[3]
         if inline[1]=='**' or inline[1]=='-':
-            return f"{location:<8}{'-':<8}{opcode:<8}{operand:<9}"
+            return f"{location:<8}{'-':<8}{opcode:<8}{operand:<8}"
         elif inline[2]=='START':
-            return f"{'-':<8}{label:<8}{opcode:<8}{operand:<9}"
+            return f"{'-':<8}{label:<8}{opcode:<8}{operand:<8}"
         else:
-            return f"{location:<8}{label:<8}{opcode:<8}{operand:<9}"
+            return f"{location:<8}{label:<8}{opcode:<8}{operand:<8}"
     elif len(inline) == 3:
         label, opcode = inline[1], inline[2]
-        return f"{location:<8}{label:<8}{opcode:<9}"
+        return f"{location:<8}{label:<8}{opcode:<8}"
     else:
-        return f"{location:<8}{inline[1]:<8}{inline[2]:<9}"
+        return f"{location:<8}{inline[1]:<8}{inline[2]:<8}"
 
 TEMP_DIR = Path("temp_files")
 
@@ -127,8 +127,9 @@ try:
                         file3.write(design(s) + f" {optab[s[2]]:<2}{symtab[s[3]].zfill(4):<8}\n")
                         temp = '^' + optab[s[2]] + symtab[s[3]].zfill(4)
                         record(temp, currentadd)
+        
                     else:
-                        file3.write(f"{s[0].zfill(4):<8}{'-':<8}{s[2]:<7} {'-':<9} {optab[s[2]]:<2}0000\n")
+                        file3.write(f"{s[0].zfill(4):<8}{'-':<8}{s[2]:<7} {'-':<8} {optab[s[2]]:<2}0000\n")
                         temp = '^' + optab[s[2]] + '0000'
                         record(temp, currentadd)
 
@@ -147,4 +148,3 @@ except Exception as e:
         file2.write(error_message)
         file3.write(error_message)
         file4.write(error_message)
-
