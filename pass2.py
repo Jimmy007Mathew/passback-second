@@ -5,9 +5,9 @@ def design(inline):
     if len(inline) == 4:
         label, opcode, operand = inline[1], inline[2], inline[3]
         if inline[1]=='**' or inline[1]=='-':
-            return f"{location:<8}{'':<8}{opcode:<8}{operand:<9}"
+            return f"{location:<8}{'-':<8}{opcode:<8}{operand:<9}"
         elif inline[2]=='START':
-            return f"{' ':<8}{label:<8}{opcode:<8}{operand:<9}"
+            return f"{'-':<8}{label:<8}{opcode:<8}{operand:<9}"
         else:
             return f"{location:<8}{label:<8}{opcode:<8}{operand:<9}"
     elif len(inline) == 3:
@@ -30,46 +30,31 @@ def string_to_hex(string):
     return hex_string
 
 symtab = {}
-try:
-    with open(symtab_file_path, 'r') as f:
-        for line in f:
-            label, address = line.split()
-            if label in symtab:
-                with open(record_file_path, 'a') as file3, open(output_file_path, 'a') as file4:
-                    file3.write(f"Duplicate label: {label}\n")
-                    file4.write(f"Duplicate label: {label}\n")
-                break
-            symtab[label] = address
-except Exception:
-    with open(record_file_path, 'a') as file3, open(output_file_path, 'a') as file4:
-        file3.write("Error has occurred while reading symtab\n")
-        file4.write("Error has occurred while reading symtab\n")
+with open(symtab_file_path, 'r') as f:
+    for line in f:
+        label, address = line.split()
+        if label in symtab:
+            with open(record_file_path, 'a') as file3, open(output_file_path, 'a') as file4:
+                file3.write(f"Duplicate label: {label}\n")
+                file4.write(f"Duplicate label: {label}\n")
+            break
+        symtab[label] = address
 
 optab = {}
-try:
-    with open(optab_file_path, 'r') as f:
-        for line in f:
-            mnemonic, opcode = line.split()
-            optab[mnemonic] = opcode
-except Exception:
-    with open(record_file_path, 'a') as file3, open(output_file_path, 'a') as file4:
-        file3.write("Error has occurred while reading optab\n")
-        file4.write("Error has occurred while reading optab\n")
 
-try:
-    with open(intermediate_file_path, 'r') as file2:
-        add1 = file2.readline()
-        st = add1.split()
-        startadd_int = int(st[0], 16)
-        last = file2.readlines()[-1]
-        re = last.split()
-        lastline_int = int(re[0], 16)
-        diff = hex(lastline_int - startadd_int)
-except Exception:
-    with open(record_file_path, 'a') as file3, open(output_file_path, 'a') as file4:
-        file3.write("Error has occurred while calculating program length\n")
-        file4.write("Error has occurred while calculating program length\n")
+with open(optab_file_path, 'r') as f:
+    for line in f:
+        mnemonic, opcode = line.split()
+        optab[mnemonic] = opcode
 
+with open(intermediate_file_path, 'r') as file2:
+    add1 = file2.readline()
+    st = add1.split()
+    startadd_int = int(st[0], 16)
+    last = file2.readlines()[-1]
+    re = last.split()
+    lastline_int = int(re[0], 16)
+    diff = hex(lastline_int - startadd_int)
 Text = ''
 tc = 0
 stack = []
@@ -106,8 +91,7 @@ try:
          open(output_file_path, 'w') as file4, \
          open(record_file_path, 'w') as file3:
 
-        file3.write(f"{'Loc':<8}{'Label':<8}{'Opcode':<8}{'Operand':<10}{'Code':<8}\n")
-        file3.write('-' * 40 + '\n')
+        
 
         for line in file2:
             s = line.split()
@@ -115,7 +99,7 @@ try:
             if s[2] == 'START':
                 startadd = s[3]
                 stadd = startadd
-                file3.write(design(s)+'\n')
+                file3.write(design(s)+f"{' -':<8}"'\n')
                 file4.write('H^' + s[1] + '^00' + s[3].zfill(4) + '^' + diff[2:].zfill(6) + '\n')
                 flg=1
             else:
@@ -131,7 +115,7 @@ try:
                         file4.write(Text.upper() + '\n')
                         stack.clear()
                         tc = 0
-                    file3.write(design(s)+'\n')
+                    file3.write(design(s)+f"{' -':<8}"+'\n')
                 elif s[2] == 'WORD':
                     file3.write(design(s) +' '+ f"{hex(int(s[3]))[2:].zfill(6):<8}\n")
                     record('^' + hex(int(s[3]))[2:].zfill(6), currentadd)
@@ -144,7 +128,7 @@ try:
                         temp = '^' + optab[s[2]] + symtab[s[3]].zfill(4)
                         record(temp, currentadd)
                     else:
-                        file3.write(f"{s[0].zfill(4):<16}{s[2]:<8} {'  ':<8} {optab[s[2]]:<2}0000\n")
+                        file3.write(f"{s[0].zfill(4):<8}{'-':<8}{s[2]:<7} {'-':<9} {optab[s[2]]:<2}0000\n")
                         temp = '^' + optab[s[2]] + '0000'
                         record(temp, currentadd)
 
@@ -156,7 +140,11 @@ try:
 
         file4.write('E^00' + stadd.zfill(4) + '\n')
 
-except Exception:
-    with open(record_file_path, 'a') as file3, open(output_file_path, 'a') as file4:
-        file3.write("Error has occurred during intermediate file processing\n")
-        file4.write("Error has occurred during intermediate file processing\n")
+except Exception as e:
+    error_message = f"Error has occurred: {str(e)}\n"
+    with open(record_file_path, 'w') as file3, open(output_file_path, 'w') as file4, open(intermediate_file_path,'w') as file2, open(symtab_file_path,'w') as file1:
+        file1.write(error_message)
+        file2.write(error_message)
+        file3.write(error_message)
+        file4.write(error_message)
+
