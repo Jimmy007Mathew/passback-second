@@ -9,7 +9,7 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://pass-second.vercel.app"],  # Adjust this to the frontend domain in production
+    allow_origins=["https://pass-second.vercel.app","https://pass-second-jimmy-mathews-projects.vercel.app"],  # Adjust this to the frontend domain in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
