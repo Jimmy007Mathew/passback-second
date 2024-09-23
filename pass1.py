@@ -8,19 +8,15 @@ def design(inline):
         return f"{symbol:<8}{label:<8}{opcode:<9}"
     elif len(inline) == 2:
         return f"{inline[0]:<8}{inline[1]:<8}"
-# Ensure paths are provided as command-line arguments
 if len(sys.argv) != 3:
     print("Usage: python pass1.py <input_file_path> <optab_file_path>")
     sys.exit(1)
-
-# Get the file paths from command-line arguments
 input_file_path = Path(sys.argv[1])
 intermediate_file_path = Path("temp_files/intermediate.txt")
 symtab_file_path = Path("temp_files/symtab.txt")
 record_file_path = Path("temp_files/record.txt")
 output_file_path = Path("temp_files/out.txt")
 
-# Open the files using the provided paths
 try:
     with input_file_path.open('r') as file1, \
          intermediate_file_path.open('w') as file2, \
